@@ -1,0 +1,716 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MedQuery metadata input v1 (one candidate publication revision per record)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "categories",
+    "title",
+    "language",
+    "issuer",
+    "document_type",
+    "authority",
+    "assets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "record_id": {
+      "$ref": "#/$defs/text"
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "clinical_protocols_ministry_directives",
+          "treatment_protocols",
+          "therapeutic_guidelines",
+          "pharmaceutical_formularies",
+          "who_guidelines"
+        ]
+      }
+    },
+    "title": {
+      "$ref": "#/$defs/text"
+    },
+    "canonical_title": {
+      "$ref": "#/$defs/text"
+    },
+    "language": {
+      "$ref": "#/$defs/language"
+    },
+    "content_languages": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/language"
+      }
+    },
+    "issuer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "kind"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/text"
+        },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "kind": {
+          "enum": [
+            "government",
+            "public_agency",
+            "intergovernmental",
+            "professional_body",
+            "academic",
+            "publisher",
+            "other",
+            "unknown"
+          ]
+        },
+        "country": {
+          "$ref": "#/$defs/country"
+        },
+        "homepage": {
+          "$ref": "#/$defs/url"
+        }
+      }
+    },
+    "document_type": {
+      "enum": [
+        "clinical_guideline",
+        "clinical_protocol",
+        "regulatory_text",
+        "ministerial_instruction",
+        "administrative_text",
+        "formulary",
+        "consensus",
+        "public_health_guidance",
+        "recommendation_sheet",
+        "implementation_guide",
+        "technology_appraisal",
+        "policy_brief",
+        "executive_summary",
+        "correction",
+        "supplement",
+        "educational_material",
+        "other",
+        "unknown"
+      ]
+    },
+    "authority": {
+      "enum": [
+        "official_national",
+        "international_reference",
+        "contextual",
+        "educational",
+        "unknown"
+      ]
+    },
+    "identity_key": {
+      "$ref": "#/$defs/text"
+    },
+    "revision_key": {
+      "$ref": "#/$defs/text"
+    },
+    "edition": {
+      "$ref": "#/$defs/text"
+    },
+    "identifiers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/identifier"
+      }
+    },
+    "publication_date": {
+      "$ref": "#/$defs/partialDate"
+    },
+    "effective_from": {
+      "$ref": "#/$defs/date"
+    },
+    "effective_until": {
+      "$ref": "#/$defs/date"
+    },
+    "publisher_status": {
+      "enum": [
+        "unknown",
+        "issued",
+        "superseded",
+        "withdrawn",
+        "draft"
+      ]
+    },
+    "official_url": {
+      "$ref": "#/$defs/url"
+    },
+    "relations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "applicability": {
+      "$ref": "#/$defs/applicability"
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "vocabulary",
+          "code",
+          "label"
+        ],
+        "properties": {
+          "vocabulary": {
+            "$ref": "#/$defs/text"
+          },
+          "code": {
+            "$ref": "#/$defs/text"
+          },
+          "label": {
+            "$ref": "#/$defs/text"
+          },
+          "scope_note": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "reuse": {
+      "$ref": "#/$defs/reuse"
+    },
+    "intake_review": {
+      "enum": [
+        "pending",
+        "hold",
+        "not_requested"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "adapter_context": {
+      "type": "object"
+    },
+    "assets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/asset"
+      },
+      "contains": {
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "const": "primary"
+          }
+        }
+      },
+      "minContains": 1,
+      "maxContains": 1
+    },
+    "identity_evidence": {
+      "$ref": "#/$defs/text"
+    },
+    "revision_evidence": {
+      "$ref": "#/$defs/text"
+    },
+    "academic_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unknown",
+            "approved_for_academic_work",
+            "declined"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "approved_for_academic_work"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "language": {
+            "const": "mul"
+          }
+        },
+        "required": [
+          "language"
+        ]
+      },
+      "then": {
+        "required": [
+          "content_languages"
+        ],
+        "properties": {
+          "content_languages": {
+            "minItems": 2,
+            "items": {
+              "not": {
+                "enum": [
+                  "mul",
+                  "und"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "text": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{1,8}(-[a-z0-9]{1,8})*$"
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://[^/\\s?#]+"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "relativePath": {
+      "type": "string",
+      "pattern": "^(?!/)(?![a-zA-Z]:)(?!.*\\\\)(?!.*(?:^|/)\\.\\.?(?:/|$))[^/]+(?:/[^/]+)*$"
+    },
+    "partialDate": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9]{4}$"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+        },
+        {
+          "$ref": "#/$defs/date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        }
+      ]
+    },
+    "identifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scheme",
+        "value",
+        "scope"
+      ],
+      "properties": {
+        "scheme": {
+          "$ref": "#/$defs/text"
+        },
+        "value": {
+          "$ref": "#/$defs/text"
+        },
+        "namespace": {
+          "$ref": "#/$defs/text"
+        },
+        "scope": {
+          "enum": [
+            "document",
+            "revision",
+            "asset",
+            "unresolved"
+          ]
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "verified"
+            ],
+            "properties": {
+              "verified": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "scope": {
+                "not": {
+                  "const": "unresolved"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "target",
+        "state"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "translation_of",
+            "replaces",
+            "supplement_to",
+            "correction_of",
+            "summary_of",
+            "co_publication_of",
+            "adaptation_of",
+            "related_to"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/text"
+        },
+        "state": {
+          "enum": [
+            "candidate",
+            "verified"
+          ]
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "locator"
+      ],
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/text"
+        },
+        "locator": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "reuse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "use_status": {
+          "$ref": "#/$defs/permission"
+        },
+        "external_embedding_status": {
+          "$ref": "#/$defs/permission"
+        },
+        "license_code": {
+          "$ref": "#/$defs/text"
+        },
+        "license_url": {
+          "$ref": "#/$defs/url"
+        },
+        "license_note": {
+          "$ref": "#/$defs/text"
+        },
+        "evidence_url": {
+          "$ref": "#/$defs/url"
+        },
+        "evidence_note": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "permission": {
+      "enum": [
+        "unknown",
+        "allowed",
+        "restricted",
+        "prohibited"
+      ]
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "geography": {
+          "enum": [
+            "unknown",
+            "global",
+            "country_list"
+          ]
+        },
+        "countries": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/country"
+          }
+        },
+        "population": {
+          "enum": [
+            "unknown",
+            "general",
+            "restricted"
+          ]
+        },
+        "scope_text": {
+          "$ref": "#/$defs/text"
+        },
+        "population_text": {
+          "$ref": "#/$defs/text"
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/rule"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "geography"
+            ],
+            "properties": {
+              "geography": {
+                "const": "country_list"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "countries"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "countries"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "population"
+            ],
+            "properties": {
+              "population": {
+                "const": "restricted"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "rules"
+            ]
+          }
+        }
+      ]
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect",
+        "population_label"
+      ],
+      "properties": {
+        "effect": {
+          "enum": [
+            "include",
+            "exclude"
+          ]
+        },
+        "population_label": {
+          "$ref": "#/$defs/text"
+        },
+        "age_days": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "min_inclusive": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "max_exclusive": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          }
+        },
+        "sex": {
+          "$ref": "#/$defs/text"
+        },
+        "pregnancy_status": {
+          "$ref": "#/$defs/text"
+        },
+        "care_setting": {
+          "$ref": "#/$defs/text"
+        },
+        "criteria_text": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "role"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "role": {
+          "enum": [
+            "primary",
+            "annex",
+            "alternate"
+          ]
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "identifiers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "acquisition": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requested_url": {
+              "$ref": "#/$defs/url"
+            },
+            "resolved_url": {
+              "$ref": "#/$defs/url"
+            },
+            "acquired_on": {
+              "$ref": "#/$defs/date"
+            },
+            "method": {
+              "$ref": "#/$defs/text"
+            },
+            "evidence_note": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "reuse": {
+          "$ref": "#/$defs/reuse"
+        },
+        "observed": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "media_type": {
+              "$ref": "#/$defs/text"
+            },
+            "pages": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "minProperties": 1
+        },
+        "adapter_context": {
+          "type": "object"
+        },
+        "attachment_type": {
+          "enum": [
+            "correction",
+            "supplement",
+            "annex",
+            "alternate_rendition"
+          ]
+        }
+      }
+    }
+  }
+}

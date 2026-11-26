@@ -1,0 +1,33 @@
+{
+  "collection_root": "data/raw/therapeutic_guidelines_data./therapeutic_guidelines_data/therapeutic_guidelines",
+  "pilot": "data/ingestion/phase1/pilot_documents.csv",
+  "phase2": "data/ingestion/phase2/therapeutic",
+  "working_dir": "data/ingestion/phase3",
+  "development_assets": [
+    "MQ-TG-HAS-STROKE",
+    "MQ-TG-DZ-TB",
+    "MQ-TG-WHO-EMRO-MHGAP-AR",
+    "MQ-TG-FINAL-ETA-THYROID"
+  ],
+  "dpi": 250,
+  "review_dpi": 145,
+  "timeout_seconds": 90,
+  "structured_timeout_seconds": 180,
+  "minimum_letters": 40,
+  "garble_fraction": 0.02,
+  "scan_area": 0.6,
+  "region_min_area": 0.025,
+  "region_max_count": 8,
+  "region_max_ink": 0.35,
+  "blank_max_ink": 0.001,
+  "ocr_workers": 1,
+  "ocr_languages": {
+    "en": "eng",
+    "fr": "fra+eng",
+    "ar": "ara+eng"
+  },
+  "reference_iou": 0.5,
+  "heading_font_ratio": 1.18,
+  "refined_blank_edge": 0.003,
+  "refined_region_padding": 0.025
+}

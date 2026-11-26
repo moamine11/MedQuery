@@ -1,6 +1,7 @@
 # Local configuration and credentials
 .env
 .env.*
+!.env.example
 .envrc
 .pgpass
 .pg_service.conf
@@ -19,8 +20,18 @@ service-account*.json
 *.p12
 *.pfx
 
-# Database files, backups, and local datasets
+# Raw medical datasets, generated pipeline artifacts, and transfer archives
 /data/
+*.zip
+*.tar.gz
+*.sha256
+*.safetensors
+*.pdiparams
+hf_cache/
+.huggingface/
+.cache/
+
+# Database files, dumps, and backups
 postgres_data/
 pgdata/
 backups/
@@ -31,18 +42,47 @@ dumps/
 *.sqlite
 *.sqlite3
 
-# Python environments, caches, and generated files
+# Internal development documentation and historical audits (keep docs/ingestion/ specs & runtime schema tracked)
+docs/ingestion/PHASE_*_REPORT.md
+docs/ingestion/PHASE_*_PREPARATION_REPORT.md
+docs/ingestion/FINAL_DATABASE_REPORT.md
+docs/ingestion/CURRENT_STATE_AUDIT.md
+docs/ingestion/DATASET_INSPECTION.md
+docs/ingestion/DATASET_INTEGRATION_REPORT.md
+docs/ingestion/EXTRACTION_COMPATIBILITY_REPORT.md
+docs/ingestion/EXTRACTION_EXPERIMENTS.md
+docs/ingestion/IMPLEMENTATION_PLAN.md
+docs/ingestion/inspect_guidelines.py
+docs/ingestion/harmonize_guidelines.py
+docs/ingestion/prepare_integration.py
+
+# Virtual environments, Python/test caches, and build outputs
 .venv/
 venv/
+env/
+*-venv/
 .python-version
 __pycache__/
 *.py[cod]
+*$py.class
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.unittest_cache/
 .coverage
 htmlcov/
 *.egg-info/
 /build/
 /dist/
 *.log
+
+# Notebook checkpoints and IDE / OS metadata
+.ipynb_checkpoints/
+notebooks/*.nbconvert.*
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

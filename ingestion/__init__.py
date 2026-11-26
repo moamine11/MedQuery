@@ -1,0 +1,1 @@
+"""MedQuery local collection intake."""

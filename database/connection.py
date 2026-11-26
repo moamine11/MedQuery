@@ -1,12 +1,18 @@
 """Open psycopg connections using the local Compose defaults."""
 
-import os
+from __future__ import annotations
 
-import psycopg
+import os
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import psycopg
 
 
 def connect() -> psycopg.Connection:
     """Connect using PG* settings and fall back to the Compose password."""
+    import psycopg
+
     settings = {
         "host": os.environ.get("PGHOST", "127.0.0.1"),
         "port": os.environ.get("PGPORT") or os.environ.get("POSTGRES_HOST_PORT") or "5433",

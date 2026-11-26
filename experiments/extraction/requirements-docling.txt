@@ -1,0 +1,11 @@
+# Install the pinned CPU wheels first (see README).
+docling==2.63.0
+docling-core==2.50.1
+docling-ibm-models==3.9.1
+docling-parse==4.7.3
+transformers==4.57.3
+huggingface-hub==0.36.2
+numpy==2.2.6
+scipy==1.16.3
+PyMuPDF==1.26.7
+Pillow==11.3.0

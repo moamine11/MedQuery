@@ -1,0 +1,36 @@
+# Metadata mapping and adapters
+
+## Canonical input to PostgreSQL
+
+| Canonical input or generated data | Existing destination | Mapping rule |
+| --- | --- | --- |
+| `issuer.{key,name,kind,country,homepage}` | `sources` | Resolve issuer aliases and distinct co-issuers with evidence. Store the resolved source key, name, kind, country and homepage. A distributor may have its own source row tied to acquisition. |
+| Identity key, canonical title, primary language | `documents` | Use the resolved issuer, work key and language. Keep the as-published title at revision level. Resolve verified translation targets before setting `translation_of_id`. |
+| `identifiers[]` | `document_identifiers`, provenance snapshot | Only verified work-level identifiers go into the unique source/scheme/value index. Keep edition, rendition and unclassified identifiers in the local snapshot. Resolve namespace to a source. |
+| `categories[]` | `document_categories` | Upsert all verified associations at document level. All five codes already exist in `categories`. |
+| Revision key, title, edition, issuer publication URL, full publication day, effective window, reuse | `document_versions` | Start staged. Keep year/month strings in the snapshot with no SQL date. Only a verified same-document replacement maps to `replaces_version_id`. |
+| Applicability and controlled topics | `document_versions`, `version_countries`, `version_applicability`, `medical_topics`, `version_topics` | Countries are evidence-backed ISO codes. Keep rule scope and original criteria. Use half-open nonnegative age ranges and stable rule ordering. Preserve unresolved geographic and population wording in the snapshot. |
+| Asset path, measured hash, MIME, bytes, role, reuse | `document_assets` | Resolve local path under the declared root and generate an immutable storage URI. Convert the hex digest to 32 bytes for SQL. Apply rights at asset level. Keep relative paths in local metadata for relocation. |
+| Asset acquisition or identity evidence | `ingestion_attempts` | Write actual requested and resolved source URLs, when available, plus attempt metadata and observed hash. Local discovery may have NULL URL fields. Link to asset and version after identity resolution. |
+| Intake and extended metadata | Local canonical snapshot and `ingestion_attempts.source_metadata` | Store document type, authority, additional languages, partial dates, evidence, non-FK relationships, source wording, intake labels and per-version metadata snapshot digest. Keep sensitive paths in local manifests and DB storage URIs. The existing schema has no typed columns for these extended fields. |
+| Clinical review | `clinical_reviews` | Separate append-only action after completion. The DB attaches the current clinical context revision. Preserve reviewer, decision, validity, and notes through the authorized review workflow. |
+
+Wordings, authority and relevance can change without a DB column changing. Store the reviewed extended metadata snapshot against the version and clinical context revision. Update policy-relevant extended metadata and bump the context revision within the same serialized transaction, relying on existing automatic bumps for typed context changes. The retrieval application must have a reviewed snapshot for that revision and enforce authority and document-type filtering. The SQL views on their own enforce version, review and permission gates. They cannot enforce the project’s contextual and educational policy.
+
+## Collection adapter contracts
+
+All adapters emit the canonical record plus issues and original field references. Inputs come from local files. Use an explicit selection rule for active manifests/PDF roots and preserve unmapped evidence for review.
+
+| Collection | Observed input and mapping |
+| --- | --- |
+| Therapeutic Guidelines | Verified UTF-8 BOM CSVs. `documents.csv.relative_path` joins to the active PDF. `document_id` becomes the local record ID, and `work_id` is an identity hint. `role` informs document type and asset bundling. Keep original issuer spelling, date precision, country/region text, population, rights and currency notes. Join `topic_links.csv` through document ID to `coverage.csv` for labels and scope evidence. The `manual_acquisitions.csv` supplies route and original filename evidence when reconciled by ID and hash. `pdf_validation.csv` is historical probe evidence. Recompute byte, hash and page measures. Empty active paths are catalogue-only. |
+| Clinical Protocols & Ministry Directives | Report describes crawler JSON, official domains, hashes and manual inventory. Confirm JSON shape and local folder paths with the owner. Capture official act number, date, journal issue/page/article, issuing body, source pages and Arabic/French section or edition information. Let manual evidence resolve opaque filenames without discarding crawler evidence. |
+| Treatment Protocols | Report describes `1_official_algeria/`, `2_international/`, `3_educational/` plus `copy_log.csv` for educational renames. Confirm file naming and the log columns on the owner's machine. Use tier as a hint and refine from issue/cover evidence. Preserve original path, current path, host, probable edition and contextual vs clinical roles. Route uncertain titles, old issues and suspected duplicates to review. |
+| Pharmaceutical Formularies | Dataset unavailable. Accept the common manifest or a new adapter supplied with examples. The schema can express formularies, editions, applicability and annexes. Sample actual fields and page structure before adding any specialized mapping. |
+| WHO Guidelines | Dataset unavailable. Accept the common manifest or a new adapter with examples. The schema can express issuer regions, separately issued translations, policy briefs and editions. Match local WHO files by identity and hash when they become available. |
+
+The [Phase 1 harmonization script](harmonize_guidelines.py) preserves the evidence and generates 144 candidate revision records from 146 active PDFs. It groups the `TG-0010` correction and supplement as related annex candidates, retaining each file's individual rights, dates and identifiers. It leaves DB-facing issuer keys, work/revision keys, rights decisions and structured applicability unresolved in the local pilot inventory. The raw acquisition date and known route stay separate from a candidate publisher landing page. The local TB instruction uses a society-hosted route and leaves the verified issuer's official URL open.
+
+Phase 2 implements the canonical JSONL input, generic CSV adapter and Therapeutic Guidelines CSV adapter. The adapter interface emits one source locator and candidate object at a time. The Therapeutic Guidelines adapter groups a correction or supplement only when the handoff identifies an active parent of the same work and language. The original rows and matched manual acquisition entries remain available as evidence. Issuer classification and official-source URLs from the catalogue are provisional claims. No publisher verification or structured clinical scope is inferred from the URL.
+
+Collection reports describe future adapter inputs. Add those adapters after a teammate supplies representative metadata records. The initial CLI has no PostgreSQL writer.
